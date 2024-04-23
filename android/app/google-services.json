@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "779349165108",
+    "project_id": "balaa-e77f5",
+    "storage_bucket": "balaa-e77f5.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:779349165108:android:e57967c3b78d6e4b7b3661",
+        "android_client_info": {
+          "package_name": "com.mlt.balaa_admin"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDJhL1PgsT1CzjL7OfhAlLad6jeSYSAquo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:779349165108:android:12d1323728ce1b8e7b3661",
+        "android_client_info": {
+          "package_name": "com.mlt.balaa_client"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDJhL1PgsT1CzjL7OfhAlLad6jeSYSAquo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
