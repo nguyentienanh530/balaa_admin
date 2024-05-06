@@ -1,3 +1,4 @@
+import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
 import 'package:balaa_admin/common/bloc/generic_bloc_state.dart';
@@ -17,8 +18,12 @@ import 'package:fluttertoast/fluttertoast.dart';
 
 class CreateOrUpdateCategory extends StatefulWidget {
   const CreateOrUpdateCategory(
-      {super.key, required this.categoryModel, required this.mode});
+      {super.key,
+      required this.categoryModel,
+      required this.mode,
+      required this.lenght});
   final CategoryModel categoryModel;
+  final int lenght;
   final Mode mode;
 
   @override
@@ -35,10 +40,16 @@ class _CreateOrUpdateCategoryState extends State<CreateOrUpdateCategory> {
   final _formKey = GlobalKey<FormState>();
   final _uploadImageProgress = ValueNotifier(0.0);
   final _isUploadImage = ValueNotifier(false);
+  var _lenght = 0;
+  var _sortNumber = 0;
 
   @override
   void initState() {
     _mode = widget.mode;
+    _lenght = widget.lenght;
+    if (_mode == Mode.create) {
+      _categoryModel = CategoryModel();
+    }
     _initData();
     super.initState();
   }
@@ -49,6 +60,7 @@ class _CreateOrUpdateCategoryState extends State<CreateOrUpdateCategory> {
       _nameCtrl.text = _categoryModel.name ?? '';
       _desCtrl.text = _categoryModel.description ?? '';
       _image = _categoryModel.image ?? noImage;
+      _sortNumber = _categoryModel.sort ?? 0;
     }
   }
 
@@ -59,32 +71,47 @@ class _CreateOrUpdateCategoryState extends State<CreateOrUpdateCategory> {
             key: _formKey,
             child: Column(children: [
               _buildAppbar(),
+              const SizedBox(height: 16),
               Expanded(
-                  child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                    _buildImageCatagory(),
-                    Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const SizedBox(height: 16),
-                          _buildTitle('Tên danh mục (*):'),
-                          const SizedBox(height: 8),
-                          _buildNameCatagory(),
-                          const SizedBox(height: 16),
-                          _buildTitle('Mô tả:'),
-                          const SizedBox(height: 8),
-                          _buildDescriptionCatagory()
-                        ]),
-                    const SizedBox(height: 32),
-                    _buildButton(),
-                    const SizedBox(height: 8),
-                    Text('(*) không được để trống',
-                        style: context.textStyleSmall!.copyWith(
-                            fontStyle: FontStyle.italic,
-                            color: context.colorScheme.error))
-                  ]))
+                  child: SingleChildScrollView(
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      _ImageCategory(
+                          image: _image,
+                          imageFile: _imageFile,
+                          onTap: () async =>
+                              await pickAndResizeImage().then((value) {
+                                setState(() {
+                                  _imageFile = value;
+                                });
+                              })),
+                      Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const SizedBox(height: 16),
+                            _buildTitle('Tên danh mục (*):'),
+                            const SizedBox(height: 16),
+                            _buildNameCatagory(),
+                            const SizedBox(height: 16),
+                            _buildTitle('Thứ tự hiển thị (*):'),
+                            const SizedBox(height: 16),
+                            _buildSortCatagory(),
+                            const SizedBox(height: 16),
+                            _buildTitle('Mô tả:'),
+                            const SizedBox(height: 16),
+                            _buildDescriptionCatagory()
+                          ]),
+                      const SizedBox(height: 32),
+                      _buildButton(),
+                      const SizedBox(height: 8),
+                      Text('(*) không được để trống',
+                          style: context.textStyleSmall!.copyWith(
+                              fontStyle: FontStyle.italic,
+                              color: context.colorScheme.error))
+                    ]),
+              ))
             ])));
 
     var uploadImageWidget = ValueListenableBuilder(
@@ -113,8 +140,8 @@ class _CreateOrUpdateCategoryState extends State<CreateOrUpdateCategory> {
             value ? uploadImageWidget : buildWidget);
   }
 
-  _buildTitle(String title) => Text(title,
-      style: context.titleStyleMedium!.copyWith(fontWeight: FontWeight.bold));
+  _buildTitle(String title) =>
+      Text(title, style: const TextStyle(fontWeight: FontWeight.bold));
 
   _buildNameCatagory() => CommonTextField(
       hintText: 'Tên danh mục',
@@ -150,7 +177,10 @@ class _CreateOrUpdateCategoryState extends State<CreateOrUpdateCategory> {
             progress: _uploadImageProgress);
         _isUploadImage.value = false;
         var newCategory = CategoryModel(
-            name: _nameCtrl.text, description: _desCtrl.text, image: _image);
+            name: _nameCtrl.text,
+            description: _desCtrl.text,
+            image: _image,
+            sort: _sortNumber);
         _createCategory(newCategory);
       }
     }
@@ -160,6 +190,7 @@ class _CreateOrUpdateCategoryState extends State<CreateOrUpdateCategory> {
     context
         .read<CategoryBloc>()
         .add(CategoryUpdated(categoryModel: categoryModel));
+    print(categoryModel.toString());
     showDialog(
         context: context,
         builder: (context) => BlocBuilder<CategoryBloc,
@@ -213,7 +244,10 @@ class _CreateOrUpdateCategoryState extends State<CreateOrUpdateCategory> {
     if (invalid) {
       if (_imageFile == null) {
         _categoryModel = _categoryModel.copyWith(
-            image: _image, name: _nameCtrl.text, description: _desCtrl.text);
+            image: _image,
+            name: _nameCtrl.text,
+            description: _desCtrl.text,
+            sort: _sortNumber);
         _updateCategory(_categoryModel);
       } else {
         _isUploadImage.value = true;
@@ -222,45 +256,15 @@ class _CreateOrUpdateCategoryState extends State<CreateOrUpdateCategory> {
             file: _imageFile!,
             progress: _uploadImageProgress);
         _isUploadImage.value = false;
+        // print('ad $_sortNumber');
         _categoryModel = _categoryModel.copyWith(
-            image: _image, name: _nameCtrl.text, description: _desCtrl.text);
+            image: _image,
+            name: _nameCtrl.text,
+            description: _desCtrl.text,
+            sort: _sortNumber);
         _updateCategory(_categoryModel);
       }
     }
-  }
-
-  _buildImageCatagory() {
-    return Stack(children: [
-      _imageFile == null
-          ? Container(
-              height: context.sizeDevice.width * 0.3,
-              width: context.sizeDevice.width * 0.3,
-              clipBehavior: Clip.hardEdge,
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                  border: Border.all(color: context.colorScheme.primary),
-                  shape: BoxShape.circle),
-              child: Image.network(_image.isEmpty ? noImage : _image))
-          : Container(
-              height: context.sizeDevice.width * 0.3,
-              width: context.sizeDevice.width * 0.3,
-              clipBehavior: Clip.hardEdge,
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                  border: Border.all(color: context.colorScheme.primary),
-                  shape: BoxShape.circle),
-              child: Image.memory(_imageFile!)),
-      Positioned(
-          top: context.sizeDevice.width * 0.3 - 25,
-          left: (context.sizeDevice.width * 0.3 - 20) / 2,
-          child: GestureDetector(
-              onTap: () async => await pickAndResizeImage().then((value) {
-                    setState(() {
-                      _imageFile = value;
-                    });
-                  }),
-              child: const Icon(Icons.camera_alt_rounded, color: Colors.white)))
-    ]);
   }
 
   _buildAppbar() => AppBar(
@@ -269,10 +273,111 @@ class _CreateOrUpdateCategoryState extends State<CreateOrUpdateCategory> {
           backgroundColor: Colors.transparent,
           title: Text(
               _mode == Mode.create ? 'Thêm danh mục' : "Chỉnh sửa danh mục",
-              style: context.titleStyleMedium),
+              style: context.titleStyleMedium!
+                  .copyWith(fontWeight: FontWeight.bold)),
           actions: [
             IconButton(
                 onPressed: () => context.pop(),
                 icon: const Icon(Icons.highlight_remove_rounded))
           ]);
+
+  _buildSortCatagory() {
+    var lstSort = <int>[];
+    if (_mode == Mode.create) {
+      for (int i = 0; i < _lenght + 1; i++) {
+        lstSort.add(i + 1);
+      }
+      _sortNumber = lstSort.last;
+    } else {
+      for (int i = 0; i < _lenght; i++) {
+        lstSort.add(i + 1);
+      }
+    }
+    return Wrap(
+        spacing: 4.0,
+        runSpacing: 4.0,
+        children: lstSort
+            .map((e) => SizedBox(
+                height: 25,
+                child: FilledButton(
+                    style: ButtonStyle(
+                        backgroundColor: MaterialStatePropertyAll(
+                            _sortNumber == e
+                                ? context.colorScheme.errorContainer
+                                : context.colorScheme.primaryContainer)),
+                    onPressed: () {
+                      setState(() {
+                        _sortNumber = e;
+                      });
+                      // print(_sortNumber);
+                    },
+                    child: Text(e.toString()))))
+            .toList());
+  }
+}
+
+class _ImageCategory extends StatelessWidget {
+  const _ImageCategory(
+      {required this.image, required this.imageFile, required this.onTap});
+  final String image;
+  final Uint8List? imageFile;
+  final Function()? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+        onTap: onTap,
+        child: imageFile == null
+            ? _buildImage(context)
+            : Container(
+                height: 200,
+                width: 200,
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(defaultBorderRadius),
+                    image: DecorationImage(
+                        image: MemoryImage(imageFile!), fit: BoxFit.cover))));
+  }
+
+  Widget _buildImage(BuildContext context) {
+    return image == ''
+        ? Container(
+            height: 200,
+            width: 200,
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(defaultBorderRadius)),
+            child: DottedBorder(
+                dashPattern: const [6, 6],
+                color: context.colorScheme.secondary,
+                strokeWidth: 1,
+                radius: Radius.circular(defaultBorderRadius),
+                borderType: BorderType.RRect,
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Align(
+                          alignment: Alignment.topCenter,
+                          child: Container(
+                              height: 48,
+                              width: 48,
+                              decoration: BoxDecoration(
+                                  color: context.colorScheme.primary,
+                                  border: Border.all(
+                                      color: context.colorScheme.primary,
+                                      width: 1),
+                                  borderRadius: BorderRadius.circular(
+                                      defaultBorderRadius)),
+                              child: Icon(Icons.add,
+                                  color: context.colorScheme.secondary))),
+                      SizedBox(height: defaultPadding / 2),
+                      Text("Hình ảnh Danh mục", style: context.textStyleSmall)
+                    ])))
+        : Container(
+            height: 200,
+            width: 200,
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(defaultBorderRadius),
+                image: DecorationImage(
+                    image: NetworkImage(image), fit: BoxFit.cover)));
+  }
 }

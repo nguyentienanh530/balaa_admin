@@ -60,20 +60,34 @@ class _ProfileViewState extends State<ProfileView>
   Widget build(BuildContext context) {
     super.build(context);
 
-    return BlocBuilder<UserBloc, GenericBlocState<UserModel>>(
-        buildWhen: (previous, current) =>
-            context.read<UserBloc>().operation == ApiOperation.select,
-        builder: (context, state) {
-          return (switch (state.status) {
-            Status.loading => const LoadingScreen(),
-            Status.failure => ErrorScreen(errorMsg: state.error),
-            Status.empty => const EmptyScreen(),
-            Status.success => CustomScrollView(
+    return Scaffold(
+        body: BlocBuilder<UserBloc, GenericBlocState<UserModel>>(
+            buildWhen: (previous, current) =>
+                context.read<UserBloc>().operation == ApiOperation.select,
+            builder: (context, state) {
+              return (switch (state.status) {
+                Status.loading => const LoadingScreen(),
+                Status.failure => ErrorScreen(errorMsg: state.error),
+                Status.empty => const EmptyScreen(),
+                Status.success => Responsive(
+                    mobile: _buildMobileWidget(state.data ?? UserModel()),
+                    tablet: _buildMobileWidget(state.data ?? UserModel()),
+                    desktop: _buildWebWidget(state.data ?? UserModel()))
+              });
+            }));
+  }
+
+  Widget _buildWebWidget(UserModel user) {
+    return Row(children: [
+      Expanded(
+          flex: 3,
+          child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: CustomScrollView(
                   physics: const BouncingScrollPhysics(),
                   slivers: [
                     SliverAppBar(
-                        automaticallyImplyLeading:
-                            Responsive.isDesktop(context) ? false : true,
+                        automaticallyImplyLeading: false,
                         expandedHeight: 300,
                         pinned: true,
                         stretch: true,
@@ -103,15 +117,49 @@ class _ProfileViewState extends State<ProfileView>
                                                   child: CircleAvatar(
                                                       radius: 49,
                                                       backgroundImage:
-                                                          _buildImage(state
-                                                                  .data ??
-                                                              UserModel()))))
+                                                          _buildImage(user))))
                                         ]))))),
-                    SliverToBoxAdapter(
-                        child: _buildBody(state.data ?? UserModel()))
-                  ])
-          });
-        });
+                    SliverToBoxAdapter(child: _buildBody(user))
+                  ]))),
+      const Spacer()
+    ]);
+  }
+
+  Widget _buildMobileWidget(UserModel user) {
+    return CustomScrollView(physics: const BouncingScrollPhysics(), slivers: [
+      SliverAppBar(
+          // automaticallyImplyLeading: true,
+          expandedHeight: 300,
+          pinned: true,
+          stretch: true,
+          flexibleSpace: FlexibleSpaceBar(
+              collapseMode: CollapseMode.pin,
+              background: Container(
+                  // padding: const EdgeInsets.only(bottom: 120),
+                  margin: const EdgeInsets.only(bottom: 50),
+                  decoration: const BoxDecoration(
+                      color: Colors.transparent,
+                      image: DecorationImage(
+                          fit: BoxFit.cover,
+                          image: AssetImage(
+                              "assets/image/backgroundProfile.png"))),
+                  child: Align(
+                      alignment: Alignment.bottomCenter,
+                      child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Transform.translate(
+                                offset: const Offset(0, 50),
+                                child: CircleAvatar(
+                                    backgroundColor: Colors.white,
+                                    radius: 50,
+                                    child: CircleAvatar(
+                                        radius: 49,
+                                        backgroundImage: _buildImage(user))))
+                          ]))))),
+      SliverToBoxAdapter(child: _buildBody(user))
+    ]);
   }
 
   Widget _buildItem(BuildContext context, IconData icon, String title) {
@@ -234,27 +282,17 @@ class _ProfileViewState extends State<ProfileView>
   }
 
   _handleLogout() async {
-    // showCupertinoModalPopup<void>(
-    //     context: context,
-    //     builder: (context) => CommonBottomSheet(
-    //         title: 'Chắc chắn muốn đăng xuất?',
-    //         textCancel: 'Hủy',
-    //         textConfirm: 'Đăng xuất',
-    //         textConfirmColor: context.colorScheme.errorContainer,
-    //         onConfirm: () {
-    //           context.read<AuthBloc>().add(const AuthLogoutRequested());
-    //           context.go(RouteName.login);
-    //         }));
-
-    await AppAlerts.warningDialog(context,
+    final result = await AppAlerts.warningDialog(context,
         title: 'Chắc chắn muốn đăng xuất?',
         textCancel: 'Hủy',
         textOk: 'Đăng xuất',
         btnCancelOnPress: () => context.pop(),
         btnOkOnPress: () {
-          context.read<AuthBloc>().add(const AuthLogoutRequested());
           context.go(RouteName.login);
+          context.read<AuthBloc>().add(const AuthLogoutRequested());
         });
+
+    if (result == true) {}
   }
 }
 

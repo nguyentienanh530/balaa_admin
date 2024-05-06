@@ -5,7 +5,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:formz/formz.dart';
 import 'package:go_router/go_router.dart';
-import 'package:balaa_admin/features/home/view/screen/home_screen.dart';
 import '../../../../common/dialog/app_alerts.dart';
 import '../../../../common/widget/common_button.dart';
 import '../../../../common/widget/common_line_text.dart';
@@ -90,12 +89,11 @@ class _LoginViewState extends State<LoginView> {
                         });
                         break;
                       case FormzSubmissionStatus.success:
-                        Navigator.of(context).pushReplacement(MaterialPageRoute(
-                            builder: (BuildContext context) =>
-                                const HomeScreen()));
-                        // context.replace(RouteName.home);
-                        // context.pushReplacement(RouteName.home);
-
+                        context.go(RouteName.home);
+                        context.pushReplacement(RouteName.home);
+                        // Navigator.of(context).pushReplacement(MaterialPageRoute(
+                        //     builder: (BuildContext context) =>
+                        //         const HomeScreen()));
                         break;
                       default:
                     }

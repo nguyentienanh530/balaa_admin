@@ -4,7 +4,7 @@ publish_to: 'none'
 version: 0.1.0
 
 environment:
-  sdk: '>=3.3.3 <4.0.0'
+  sdk: '>=3.2.6 <4.0.0'
 
 dependencies:
   flutter:
@@ -25,9 +25,11 @@ dependencies:
     path: packages/user_repository
   print_repository:
     path: packages/print_repository
+  banner_repository:
+    path: packages/banner_repository
 
     
-  awesome_dialog: ^3.2.0
+  # awesome_dialog: ^3.2.0
   equatable: ^2.0.5
   firebase_auth: ^4.16.0
   firebase_core: ^2.25.0
@@ -37,7 +39,7 @@ dependencies:
   google_fonts: ^6.1.0
   shared_preferences: ^2.2.2
   firebase_messaging: ^14.7.11
-  intl: ^0.19.0
+  intl: ^0.18.1
   cloud_firestore: ^4.15.0
   fluttertoast: ^8.2.4
   logger: ^2.0.2+1
@@ -57,8 +59,14 @@ dependencies:
   collection: ^1.18.0
   formz: ^0.7.0
   percent_indicator: ^4.2.3
+  device_preview: ^1.1.0
   image: ^4.1.7
   image_picker: ^1.1.0
+  url_strategy: ^0.2.0
+  easy_sidemenu: ^0.6.0
+  material_dialogs: ^1.1.4
+  lottie: ^2.7.0
+  cached_network_image: ^3.3.1
  
   
 
@@ -78,6 +86,7 @@ flutter:
   assets:
     - assets/map_style.txt
     - assets/image/
+    - assets/animations/
     - assets/image/banner/
     - assets/image/plate_food/
     - assets/image/image_recipe/
@@ -89,8 +98,10 @@ flutter:
 
 flutter_native_splash:
   android: true
-  ios: true
-  web: true
+  ios: false
+  web: false
+    # background_image: assets/image/onBoarding3.jpeg
+    # image: assets/image/icon_splash.png
   background_image: assets/image/splash.png
   image: assets/image/icon_splash.png
   android_12:
@@ -105,7 +116,8 @@ flutter_launcher_icons:
   android: true
   ios: false
   image_path: "assets/icon/icon_launcher.png"
-
+  
   web:
     generate: true
     image_path: "assets/icon/icon_launcher.png"
+  # image_path: "assets/icon/icon_launcher.png"

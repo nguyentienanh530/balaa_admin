@@ -1,20 +1,16 @@
 part of '../screen/dashboard_view.dart';
 
 extension on DashboardViewState {
-  Widget get listTable => Card(
-      elevation: 10,
-      child: Column(
+  Widget get listTable => Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             SizedBox(
                 height: 50,
                 child: Center(child: _buildTitle(title: 'Danh sách bàn ăn'))),
-            Padding(
-                padding: EdgeInsets.symmetric(horizontal: defaultPadding),
-                child: const _ListTable(isScroll: true)),
+            const _ListTable(isScroll: false),
             SizedBox(height: defaultPadding)
-          ]));
+          ]);
 }
 
 class _ListTable extends StatelessWidget {
@@ -34,11 +30,11 @@ class _ListTable extends StatelessWidget {
         var newTables = [...tableState.datas ?? <TableModel>[]];
         newTables.sort((a, b) => a.name.compareTo(b.name));
         return GridView.builder(
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
                 mainAxisSpacing: 8,
                 crossAxisSpacing: 8,
-                mainAxisExtent: context.sizeDevice.height * 0.1),
+                mainAxisExtent: 100),
             physics: isScroll
                 ? const BouncingScrollPhysics()
                 : const NeverScrollableScrollPhysics(),
