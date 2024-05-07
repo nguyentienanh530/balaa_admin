@@ -10,7 +10,7 @@ import '../../cubit/data_chart_yesterday.dart';
 import 'dashboard_view.dart';
 
 class DashboardScreen extends StatelessWidget {
-  const DashboardScreen({super.key});
+  DashboardScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

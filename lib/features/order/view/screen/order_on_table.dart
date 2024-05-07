@@ -191,13 +191,18 @@ class _OrderViewState extends State<OrderView> {
       BuildContext context, Orders orderModel, int index) {
     return Card(
         elevation: 10,
-        child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildHeaderItem(context, index, orderModel),
-              _buildBodyItem(orderModel)
-            ]));
+        child: InkWell(
+          onTap: () async {
+            await _goToEditOrder(context, orderModel);
+          },
+          child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildHeaderItem(context, index, orderModel),
+                _buildBodyItem(orderModel)
+              ]),
+        ));
   }
 
   Widget _buildHeaderItem(BuildContext context, int index, Orders orders) =>
@@ -240,12 +245,6 @@ class _OrderViewState extends State<OrderView> {
                           : const SizedBox(),
                       const SizedBox(width: 8),
                       CommonIconButton(
-                          icon: Icons.edit,
-                          onTap: () async {
-                            await _goToEditOrder(context, orders);
-                          }),
-                      const SizedBox(width: 8),
-                      CommonIconButton(
                           icon: Icons.delete,
                           color: context.colorScheme.errorContainer,
                           onTap: () {
@@ -285,7 +284,7 @@ class _OrderViewState extends State<OrderView> {
                                 onPressed: () {
                                   _getData();
                                   _updateTable();
-                                  pop(context, 1);
+                                  pop(context, 2);
                                 })
                           })));
         });
