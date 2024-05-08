@@ -210,7 +210,7 @@ class _AppViewState extends State<AppView> {
           ///////////////////////////////////////////////////////////////////////////
         ]);
     return MaterialApp.router(
-        title: 'Ẩm Thực Balaa',
+        title: 'Minh Long Menu',
         debugShowCheckedModeBanner: false,
         scrollBehavior: MyCustomScrollBehavior(),
         theme: AppTheme.dark,
